@@ -1,0 +1,13 @@
+body {
+    background-color: #111111;
+}
+#canvas {
+    float: left;
+
+}
+
+#menu {
+    height: 500px;
+    width: 500px;
+    float: left;
+}
