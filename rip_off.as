@@ -1,3 +1,21 @@
+if (Input.pressed(Key.LEFT))
+{
+    var shadowBlock:PaletteBlock = mBlocks[mSelectedBlock.mColumn-1][mSelectedBlock.mRow];
+    shadowBlock.mColor.Hue = mSelectedBlock.mColor.Hue + FP.sign(mShadowSlider.mShadowColor - mSelectedBlock.mColor.Hue) * 14;
+    shadowBlock.mColor.Luminance = mSelectedBlock.mColor.Luminance - .14;
+    shadowBlock.mColor.Saturation = mSelectedBlock.mColor.Saturation;
+
+    mSelectedBlock = shadowBlock;
+}
+else if (Input.pressed(Key.RIGHT))
+{
+    var lightBlock:PaletteBlock = mBlocks[mSelectedBlock.mColumn+1][mSelectedBlock.mRow];
+    lightBlock.mColor.Hue = mSelectedBlock.mColor.Hue + FP.sign(mShadowSlider.mHighlightColor - mSelectedBlock.mColor.Hue) * 14;
+    lightBlock.mColor.Luminance = mSelectedBlock.mColor.Luminance + .14;
+    lightBlock.mColor.Saturation = mSelectedBlock.mColor.Saturation;
+
+    mSelectedBlock = lightBlock;
+}
 else if (Input.pressed(Key.DOWN))
 {
     var otherBlock:PaletteBlock;
@@ -30,14 +48,4 @@ else if (Input.pressed(Key.DOWN))
         modBlock.mColor.Luminance = FP.lerp(mSelectedBlock.mColor.Luminance, otherBlock.mColor.Luminance, i / (blocksBetween + 1));
     }
 
-}
-
-else if (Input.pressed(Key.RIGHT))
-{
-    var lightBlock:PaletteBlock = mBlocks[mSelectedBlock.mColumn+1][mSelectedBlock.mRow];
-    lightBlock.mColor.Hue = mSelectedBlock.mColor.Hue + FP.sign(mShadowSlider.mHighlightColor - mSelectedBlock.mColor.Hue) * 14;
-    lightBlock.mColor.Luminance = mSelectedBlock.mColor.Luminance + .14;
-    lightBlock.mColor.Saturation = mSelectedBlock.mColor.Saturation;
-
-    mSelectedBlock = lightBlock;
 }

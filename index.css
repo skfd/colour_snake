@@ -1,13 +1,41 @@
 body {
     background-color: #111111;
+    color: #FFFFFF;
+    text-transform: capitalize;
 }
 #canvas {
     float: left;
-
 }
 
 #menu {
     height: 500px;
     width: 500px;
     float: left;
+}
+
+label {
+}
+
+h2 {
+    text-transform: capitalize;
+    margin: 0 0 0 0;
+}
+
+#main_colour{
+
+}
+
+#shadow_colour{
+    float: left;
+    width:250px;
+}
+
+#highlight_colour{
+    float: left;
+    width:250px;
+}
+
+#buttons{
+    float: left;
+
 }
