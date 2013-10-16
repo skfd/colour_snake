@@ -203,6 +203,14 @@ var getPixelColour = function(pixel) {
 }
 
 var buildShadowLeft = function(pixel) {
+    buildToneInDirection(pixel, 14, - 0.14, -1, 0);
+}
+
+var buildHighlightRight = function(pixel) {
+    buildToneInDirection(pixel, 14, 0.14, 1, 0);
+}
+
+var buildToneInDirection = function(pixel, hue_inc, luminosity_inc, direction_x, direction_y) {
     // var shadowBlock:PaletteBlock = mBlocks[mSelectedBlock.mColumn-1][mSelectedBlock.mRow];
     // shadowBlock.mColor.Hue = mSelectedBlock.mColor.Hue + FP.sign(mShadowSlider.mShadowColor - mSelectedBlock.mColor.Hue) * 14;
     // shadowBlock.mColor.Luminance = mSelectedBlock.mColor.Luminance - .14;
@@ -211,8 +219,8 @@ var buildShadowLeft = function(pixel) {
     // mSelectedBlock = shadowBlock;
 
     var target_pixel = {
-        x: pixel.x - 1,
-        y: pixel.y
+        x: pixel.x + direction_x,
+        y: pixel.y + direction_y
     },
         source_colour = getPixelColour(state.selected_pixel);
 
@@ -223,9 +231,9 @@ var buildShadowLeft = function(pixel) {
     var sign = (state.current_shadow.h - source_colour.h >= 0) ? 1 : -1;
 
     var colour = {
-        h: source_colour.h + sign * 14/360,
+        h: source_colour.h + sign * hue_inc/360,
         s: source_colour.s,
-        l: source_colour.l - 0.14
+        l: source_colour.l + luminosity_inc
     };
 
     //var rgb = hslToRgb(colour.h, colour.s, colour.l);
@@ -302,11 +310,11 @@ $(function() {
     });
 
     $('#right').click(function() {
-        
+        buildHighlightRight(state.selected_pixel);
     });
 })
 
-// credit : http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+// credit : https://gist.github.com/mnbayazit/6513318
 
 hslToRgb = function(h, s, l){
     var r, g, b;
