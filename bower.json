@@ -1,0 +1,26 @@
+{
+  "name": "Colour snake",
+  "main": "index.js",
+  "version": "0.0.2",
+  "authors": [
+    "Konstantin Konev <kk@comentality.com>"
+  ],
+  "description": "Pallet maker for pixel art",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "pixel_art",
+    "pixel",
+    "color"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
