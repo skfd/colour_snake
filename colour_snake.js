@@ -80,34 +80,32 @@ define(['grid', 'menu', 'controls', 'color_converter'],
 
 
 
-/*
-            // init controls
-            state.controls = controls();
 
-            state.controls.on_left(function() {
+            // init controls
+            controls.on_left(function() {
                 state.grid.build_left();
             });
 
-            state.controls.on_right(function() {
+            controls.on_right(function() {
                 state.grid.build_right();
             });
 
-            state.controls.on_up(function() {
+            controls.on_up(function() {
                 state.grid.build_up();
             });
 
-            state.controls.on_down(function() {
+            controls.on_down(function() {
                 state.grid.build_down();
             });
-*/
 
-            $('#left').click(function() {
-                state.grid.build_left();
-            });
 
-            $('#right').click(function() {
-                state.grid.build_right();
-            });
+            // $('#left').click(function() {
+            //     state.grid.build_left();
+            // });
+
+            // $('#right').click(function() {
+            //     state.grid.build_right();
+            // });
         };
 
         return function(element_name){
