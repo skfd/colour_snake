@@ -2,16 +2,17 @@ define(['grid', 'menu', 'controls', 'color_converter'],
     function(grid, menu, controls, color_converter) {
         'use strict';
 
-        var settings = {
-            canvas_width: 600,
-            canvas_height: 600,
-            grid_size: 500,
-            pixel_size: 20,
-            bgcolor: '#111111',
-            pixel_color: '#333333',
-            selection_size: 1,
-            padding_size: 2
-        };
+// remove
+        // var settings = {
+        //     bgcolor: '#111111',
+        //     canvas_height: 600,
+        //     canvas_width: 600,
+        //     grid_size: 500,
+        //     padding_size: 2,
+        //     pixel_color: '#333333',
+        //     pixel_size: 20,
+        //     selection_size: 1,
+        // };
 
         var state = {
             pixels: [],
@@ -24,14 +25,13 @@ define(['grid', 'menu', 'controls', 'color_converter'],
         };
 
         var grid_config = {
-            canvas_width: 600,
-            canvas_height: 600,
             bgcolor : '#111111',
+            canvas_height: 600,
+            canvas_width: 600,
+            grid_size : 500,
+            padding_size : 2,
             pixel_color : '#333333',
             pixel_size : 20,
-
-            padding_size : 2,
-            grid_size : 500,
         };
 
         var html = '<canvas id="canvas"></canvas><div id="menu"><h2>Main colour</h2><div id="main_colour"></div><div class="helper"><h2>Shadow colour</h2><div id="shadow_colour"></div></div><div class="helper"><h2>Highlight colour</h2><div id="highlight_colour"></div></div><div id="buttons"><button id="clear">CLEAR</button><button id="left">left</button><button id="right">right</button><button id="up">up</button><button id="down">down</button></div></div>';
@@ -73,11 +73,6 @@ define(['grid', 'menu', 'controls', 'color_converter'],
 
             // init menu
             state.menu = menu(menu_config);
-
-            state.grid.set_on_select(function(color) {
-                state.menu.set_main_color(color);
-            });
-
 
 
 

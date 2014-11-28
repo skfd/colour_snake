@@ -17,7 +17,7 @@ define(['jquery', 'color_converter'],
                 selected_pixel: {
                     x: 0,
                     y: 0
-                }
+                },
             };
 
             var default_config = {
@@ -73,7 +73,7 @@ define(['jquery', 'color_converter'],
 
                 selectPixel(pixel);
 
-                colorisePixel(pixel, state.main_color);
+                //colorisePixel(pixel, state.main_color);
             };
 
             var unclickHandler = function() {
@@ -252,6 +252,7 @@ define(['jquery', 'color_converter'],
 
             var set_main_color = function(color){
                 state.main_color = color;
+                colorisePixel(state.selected_pixel, color);
             };
             var set_highlight_color = function(){};
             var set_shadow_color = function(){};
@@ -288,8 +289,6 @@ define(['jquery', 'color_converter'],
                 build_right: build_right,
                 build_up : build_up,
                 build_down : build_down,
-
-                set_on_select: set_on_select,
 
                 set_main_color : set_main_color,
                 set_highlight_color : set_highlight_color,
