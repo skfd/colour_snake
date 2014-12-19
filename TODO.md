@@ -13,3 +13,5 @@ vertical snaking
 horizontal snaking
 keyboard
 colour picker styling
+colour buffer
+format colour picker

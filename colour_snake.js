@@ -32,13 +32,14 @@ define(['grid', 'menu', 'controls', 'color_converter'],
             padding_size : 2,
             pixel_color : '#333333',
             pixel_size : 20,
+
+            on_select : function(colour) {
+                console.log(color_converter.hsl_to_formatted(colour));
+                state.menu.set_main_color(colour);
+            }
         };
 
-        var html = '<canvas id="canvas"></canvas><div id="menu"><h2>Main colour</h2><div id="main_colour"></div><div class="helper"><h2>Shadow colour</h2><div id="shadow_colour"></div></div><div class="helper"><h2>Highlight colour</h2><div id="highlight_colour"></div></div><div id="buttons"><button id="clear">CLEAR</button><button id="left">left</button><button id="right">right</button><button id="up">up</button><button id="down">down</button></div></div>';
-
         var init = function(element_name) {
-            $(element_name).html(html);
-
             // init grid
             state.grid = grid( '#canvas', grid_config);
 
@@ -67,6 +68,7 @@ define(['grid', 'menu', 'controls', 'color_converter'],
             state.current_shadow = {h: 0.66015625, s: 1, l: 1};
             state.current_highlight = {h: 0.16796875, s: 1, l: 1};
 
+
             state.grid.set_main_color(state.current_color);
             state.grid.set_shadow_color(state.current_shadow);
             state.grid.set_highlight_color(state.current_highlight);
@@ -74,7 +76,9 @@ define(['grid', 'menu', 'controls', 'color_converter'],
             // init menu
             state.menu = menu(menu_config);
 
-
+            state.grid.set_on_select(function(colour) {
+                state.menu.set_main_color(colour);
+            });
 
             // init controls
             controls.on_left(function() {

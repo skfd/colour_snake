@@ -1,20 +1,43 @@
 <!DOCTYPE HTML>
 <html lang="en-US">
     <head>
-    <!--
+        <!--
         <script src="bower_components/jquery/dist/jquery.js"></script>
         <script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
         <script src="bower_components/jquery.colorpicker/jquery.colorpicker.js"></script>
--->
+        -->
         <script data-main="index.js" src="bower_components/requirejs/require.js"></script>
-
-        <link rel="stylesheet" type="text/css" href="bower_components/jquery.colorpicker/jquery.colorpicker.css">        
-
+        <link rel="stylesheet" type="text/css" href="bower_components/jquery.colorpicker/jquery.colorpicker.css">
         <link rel="stylesheet" type="text/css" href="index.css">
-
         <meta charset=utf-8/>
     </head>
     <body>
-    <div id="main"></div>
+        <div id="main">
+            <canvas id="canvas"></canvas>
+            <div id="menu">
+                <h2>Main colour</h2>
+                <div id="main_colour"></div>
+                <div>
+                    <div class="helper">
+                        <h2>Shadow colour</h2>
+                        <div id="shadow_colour"></div>
+                    </div>
+                    <div class="helper">
+                        <h2>Highlight colour</h2>
+                        <div id="highlight_colour"></div>
+                    </div>
+                </div>
+                <div id="buttons">
+                    <button id="clear">CLEAR</button>
+                    <button id="left">left</button>
+                    <button id="right">right</button>
+                    <button id="up">up</button>
+                    <button id="down">down</button>
+                </div>
+            </div>
+        </div>
+        <div id="footer">
+            
+        </div>
     </body>
 </html>

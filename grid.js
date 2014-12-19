@@ -69,11 +69,11 @@ define(['jquery', 'color_converter'],
                     return false;
                 } else {
                     state.clicked = 'left';
+                    config.on_select(getPixelColour(pixel));
                 }
 
                 selectPixel(pixel);
 
-                //colorisePixel(pixel, state.main_color);
             };
 
             var unclickHandler = function() {
@@ -85,10 +85,6 @@ define(['jquery', 'color_converter'],
 
                 if (!state.clicked) {
                     return;
-                }
-
-                if (state.clicked == 'left') {
-                    colorisePixel(pixel, state.main_color);
                 }
 
                 if (state.clicked == 'right') {
@@ -290,6 +286,7 @@ define(['jquery', 'color_converter'],
                 build_up : build_up,
                 build_down : build_down,
 
+                set_on_select : set_on_select,
                 set_main_color : set_main_color,
                 set_highlight_color : set_highlight_color,
                 set_shadow_color : set_shadow_color
