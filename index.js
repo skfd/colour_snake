@@ -43,7 +43,11 @@ var fill_canvas = function(pixel_color, pixel_size, ctx) {
 
     number_of_rects = Math.floor(settings.grid_size / (pixel_size + ps));
 
-    state.pixels = new Array(number_of_rects * number_of_rects);
+    state.grid_dim = number_of_rects;
+    state.colours = [];
+    for (var c = 0; c < number_of_rects; c++) {
+        state.colours[c] = new Array(number_of_rects).fill(null);
+    }
 
     for (var i = 0; i < number_of_rects; i++) {
         for (var j = 0; j < number_of_rects; j++) {
@@ -104,16 +108,47 @@ var getPixelByCoords = function(x, y) {
 var blackenPixel = function(pixel) {
     colorisePixel(pixel, settings.pixel_color.replace('#', ''));
 }
+var inGrid = function(pixel) {
+    return pixel.x >= 0 && pixel.y >= 0 &&
+        pixel.x < state.grid_dim && pixel.y < state.grid_dim;
+}
+
+var getStoredColour = function(pixel) {
+    return inGrid(pixel) ? state.colours[pixel.x][pixel.y] : null;
+}
+
+var hexToHsl = function(hex) {
+    hex = hex.replace('#', '');
+    return rgbToHsl(
+        parseInt(hex.substring(0, 2), 16),
+        parseInt(hex.substring(2, 4), 16),
+        parseInt(hex.substring(4, 6), 16)
+    );
+}
+
 var colorisePixel = function(pixel, colour) {
     colour = colour || state.current_color;
 
     var coords = getCoordsByPixel(pixel.x, pixel.y);
+    var hsl;
 
-    if (colour.h) {
-        state.ctx.fillStyle = hslToString(colour);
-
+    if (typeof colour === 'object') {
+        hsl = {
+            h: ((colour.h % 1) + 1) % 1,
+            s: colour.s,
+            l: Math.max(0, Math.min(1, colour.l))
+        };
+        state.ctx.fillStyle = hslToString(hsl);
     } else {
         state.ctx.fillStyle = '#' + colour;
+        // an erase repaints the empty-cell colour; record it as empty
+        hsl = ('#' + colour).toLowerCase() === settings.pixel_color.toLowerCase()
+            ? null
+            : hexToHsl(colour);
+    }
+
+    if (inGrid(pixel)) {
+        state.colours[pixel.x][pixel.y] = hsl;
     }
 
     state.ctx.fillRect(coords.x, coords.y, settings.pixel_size, settings.pixel_size);
@@ -196,51 +231,96 @@ var unclickHandler = function() {
     state.clicked = null;
 }
 
-var getPixelColour = function(pixel) {
-    var coords = getCoordsByPixel(pixel);
-    var data = state.ctx.getImageData(coords.x+1, coords.y+1, 1, 1).data;
-    return rgbToHsl(data[0], data[1], data[2]);
-}
+// Shade the block to the left: hue nudged 14 degrees towards the shadow
+// colour, luminance dropped. (rip_off.as, Key.LEFT)
+var buildShadow = function() {
+    var source = getStoredColour(state.selected_pixel);
 
-var buildShadowLeft = function(pixel) {
-    buildToneInDirection(pixel, 14, - 0.14, -1, 0);
-}
-
-var buildHighlightRight = function(pixel) {
-    buildToneInDirection(pixel, 14, 0.14, 1, 0);
-}
-
-var buildToneInDirection = function(pixel, hue_inc, luminosity_inc, direction_x, direction_y) {
-    // var shadowBlock:PaletteBlock = mBlocks[mSelectedBlock.mColumn-1][mSelectedBlock.mRow];
-    // shadowBlock.mColor.Hue = mSelectedBlock.mColor.Hue + FP.sign(mShadowSlider.mShadowColor - mSelectedBlock.mColor.Hue) * 14;
-    // shadowBlock.mColor.Luminance = mSelectedBlock.mColor.Luminance - .14;
-    // shadowBlock.mColor.Saturation = mSelectedBlock.mColor.Saturation;
-
-    // mSelectedBlock = shadowBlock;
-
-    var target_pixel = {
-        x: pixel.x + direction_x,
-        y: pixel.y + direction_y
-    },
-        source_colour = getPixelColour(state.selected_pixel);
-
-    if (target_pixel.x < 0) {
+    if (!source || source.l <= 0) {     // nothing, or already black
         return;
     }
 
-    var sign = (state.current_shadow.h - source_colour.h >= 0) ? 1 : -1;
+    var target = { x: state.selected_pixel.x - 1, y: state.selected_pixel.y };
 
-    var colour = {
-        h: source_colour.h + sign * hue_inc/360,
-        s: source_colour.s,
-        l: source_colour.l + luminosity_inc
-    };
+    if (!inGrid(target)) {
+        return;
+    }
 
-    //var rgb = hslToRgb(colour.h, colour.s, colour.l);
+    var sign = (state.current_shadow.h - source.h >= 0) ? 1 : -1;
 
-    colorisePixel(target_pixel, colour);
+    colorisePixel(target, {
+        h: source.h + sign * 14 / 360,
+        s: source.s,
+        l: source.l - 0.14
+    });
 
-    selectPixel(target_pixel);
+    selectPixel(target);
+}
+
+// Light the block to the right: hue nudged towards the highlight colour,
+// luminance raised. (rip_off.as, Key.RIGHT)
+var buildHighlight = function() {
+    var source = getStoredColour(state.selected_pixel);
+
+    if (!source || source.l >= 1) {     // nothing, or already white
+        return;
+    }
+
+    var target = { x: state.selected_pixel.x + 1, y: state.selected_pixel.y };
+
+    if (!inGrid(target)) {
+        return;
+    }
+
+    var sign = (state.current_highlight.h - source.h >= 0) ? 1 : -1;
+
+    colorisePixel(target, {
+        h: source.h + sign * 14 / 360,
+        s: source.s,
+        l: source.l + 0.14
+    });
+
+    selectPixel(target);
+}
+
+// Walk down (or up) the column to the next coloured block and fill the gap
+// with a gradient between the two. (rip_off.as, Key.DOWN)
+var buildBlend = function(direction) {
+    var sel = state.selected_pixel;
+    var source = getStoredColour(sel);
+
+    if (!source) {
+        return;
+    }
+
+    var oy, other = null;
+    for (oy = sel.y + direction; oy >= 0 && oy < state.grid_dim; oy += direction) {
+        var found = getStoredColour({ x: sel.x, y: oy });
+        if (found) {
+            other = found;
+            break;
+        }
+    }
+
+    if (!other) {
+        return;
+    }
+
+    var span = Math.abs(oy - sel.y);
+    var from = hslToRgb(source.h, source.s, source.l);
+    var to = hslToRgb(other.h, other.s, other.l);
+
+    for (var i = 1; i < span; i++) {
+        var t = i / span;
+        var blended = rgbToHsl(
+            from.r + (to.r - from.r) * t,
+            from.g + (to.g - from.g) * t,
+            from.b + (to.b - from.b) * t
+        );
+        colorisePixel({ x: sel.x, y: sel.y + direction * i }, blended);
+    }
+
+    selectPixel({ x: sel.x, y: oy });
 }
 
 $(function() {
@@ -305,12 +385,21 @@ $(function() {
         return false;
     }
 
-    $('#left').click(function() {
-        buildShadowLeft(state.selected_pixel);
-    });
+    $('#left').click(buildShadow);
+    $('#right').click(buildHighlight);
+    $('#up').click(function() { buildBlend(-1); });
+    $('#down').click(function() { buildBlend(1); });
+    $('#clear').click(function() { init(canvas); });
 
-    $('#right').click(function() {
-        buildHighlightRight(state.selected_pixel);
+    $(document).keydown(function(event) {
+        switch (event.which) {
+            case 37: buildShadow(); break;      // left arrow
+            case 39: buildHighlight(); break;   // right arrow
+            case 38: buildBlend(-1); break;     // up arrow
+            case 40: buildBlend(1); break;      // down arrow
+            default: return;
+        }
+        event.preventDefault();
     });
 })
 
